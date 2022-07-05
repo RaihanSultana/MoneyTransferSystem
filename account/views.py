@@ -20,9 +20,14 @@ User = get_user_model()
 
 class SendMoneyView(GenericAPIView):
     """
-    View to send money
-    ::param: amount:int, from_acount_id:int, to_account_id:list(example: ["3", "4"]), time:%Y-%m-%d %H:%M:%S(example: 2022-07-05 12:42:00), set_time: boolean(example: true)
+    View to send money from his/her account to one or many other users at now or scheduled time.
 
+    Explanation: If set_time=True, PeriodicTask is created to run task:'send_money_on_scheduled_time' in the scheduled time.
+                If set_time=False, check if sender has sufficient amount in account,
+                if yes, then Transaction obj is created for each user from to_account_id list and receivers and senders object's amount is updated
+                if no, returns Validation error
+
+    ::param: amount:int, to_account_id:list(example: ["3", "4"]), time:%Y-%m-%d %H:%M:%S(example: 2022-07-05 12:42:00), set_time: boolean(example: true)
     json_param_sample: {
                             "amount": "10.00",
                             "to_account_id": ["3", "4"],
@@ -56,7 +61,7 @@ class SendMoneyView(GenericAPIView):
                 one_off=True
             )  # creating periodic task using celery to run the task at scheduled time
             return Response({"detail": "Transaction has been scheduled"}, status=status.HTTP_200_OK)
-        else:
+        else:  # money will be sent now
             time = request.data.pop('time')
 
             for to_account_id in to_account_id_list:
@@ -76,7 +81,7 @@ class SendMoneyView(GenericAPIView):
 
 
 class TransactionHistory(GenericAPIView):
-    """ Transaction History """
+    """ View to get list of Transaction for logged in user """
     serializer_class = TransactionSerializer
     permission_classes = [IsAuthenticated]
 

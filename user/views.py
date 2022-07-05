@@ -9,18 +9,19 @@ from django.contrib.auth.hashers import make_password
 from .serializers import UserSerializer
 from rest_framework.generics import GenericAPIView
 from account.serializers import AccountSerializer
-
 User = get_user_model()
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    """ View to get list of users registered"""
     queryset = User.objects.filter(is_staff=False)
     serializer_class = UserSerializer
 
 
 class RegisterView(GenericAPIView):
     """
-    Register Api View
+    View for registrations
+    ::param: username:str, phone:str, password1:str, password2:str
     """
     serializer_class = UserSerializer
 
