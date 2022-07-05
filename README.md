@@ -3,6 +3,13 @@ A person can send money from their account to one or many user's account now or 
 
 
 Requirements: Celery, Redis(in order to reun celery)
+
+Command to Start a Celery worker service:
+celery -A money_transfer_system.celery worker --pool=solo -l info
+
+Command to start the beat service
+celery -A money_transfer_system.celery beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+
 Steps:
 1. pip install -r requirements.txt - This will install all the required packages that are required to run the project
 2. After installing the packages, and migrating, Create test users using registration api : '127.0.0.0:800/api/register/'
